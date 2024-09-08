@@ -1,66 +1,119 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Attendance Lab System
+<!--  tables of content  -->
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Table of Contents
 
-## About Laravel
+- [Laravel Attendance Lab System](#laravel-attendance-lab-system)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Tech Stack](#tech-stack)
+  - [Requirements](#requirements)
+  - [Getting Started](#getting-started)
+  - [Usage](#usage)
+  - [API](#api)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Support](#support)
+<!--  end tables of content  -->
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This project is a Laravel-based attendance system designed for general use. It features face recognition, geolocation, and flexible shift management. The system is ideal for organizations needing an efficient way to track attendance, manage schedules, and handle absences.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Face Recognition**: Users can clock in and out using face recognition technology.
+- **Geolocation**: Ensures that attendance is recorded only when users are at the specified location.
+- **Absence Management**: Users can provide reasons and evidence for absences.
+- **User-Friendly Interface**: Built with Filament to provide a clean and intuitive admin panel.
 
-## Learning Laravel
+## Tech Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Laravel 11.x**: The PHP framework used to build the application.
+- **Filament 3**: Used for the admin interface and resource management.
+- **MySQL 8.0**: The database system used to store all records.
+- **Sanctum**: For API authentication.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Requirements
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP 8.0 or higher
+- Composer
+- MySQL 8.0 or higher
+  
+## Getting Started
 
-## Laravel Sponsors
+To get started with the Laravel Attendance Lab project, follow the steps below:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. **Clone the repository**:
 
-### Premium Partners
+    ```bash
+    git clone https://github.com/IlhamGhaza/laravel-attendance-lab.git
+    cd laravel-attendance-lab
+    ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+2. **Install dependencies**:
+
+    ```bash
+    composer install
+    ```
+
+3. **Copy the `.env.example` file to `.env`**:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+4. **Generate application key**:
+
+    ```bash
+    php artisan key:generate
+    ```
+
+5. **Set up your database**:
+    - Update the `.env` file with your database credentials.
+    - Run migrations and seeders:
+
+      ```bash
+      php artisan migrate --seed
+      ```
+
+6. **Serve the application**:
+
+    ```bash
+    php artisan serve
+    ```
+
+7. **Access the application**:
+
+    Open your web browser and visit `http://localhost:8000` to access the Laravel Attendance Lab application.
+
+## Usage
+
+- **Admin Panel**: Manage shifts, schedules, and attendance records via the Filament interface.
+- **Clock In/Out**: Users can clock in and out using the face recognition feature.
+- **Manage Shifts**: Admins can create and manage shifts for users.
+- **Absence Requests**: Users can submit absence requests with reasons and evidence.
+
+<!-- ## Documentation
+
+For detailed documentation on how to use and customize the Laravel Attendance Lab project, please refer to the [official documentation](https://github.com/IlhamGhaza/laravel-attendance-lab/wiki). -->
+
+## API
+<!-- check api in postman_collections -->
+you can use postman to test api in postman_collections folder
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Contributions are welcome! Please follow the standard GitHub flow:
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Fork the repository.
+2. Create a new branch.
+3. Make your changes.
+4. Submit a pull request.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Support
+
+If you encounter any issues or have any questions, please feel free to reach out to the project maintainer at [Email](cb7ezeur@selenakuyang.anonaddy.com).
