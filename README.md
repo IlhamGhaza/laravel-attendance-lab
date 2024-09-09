@@ -7,6 +7,7 @@
   - [Table of Contents](#table-of-contents)
   - [Features](#features)
   - [Tech Stack](#tech-stack)
+  - [Screenshot](#screenshot)
   - [Requirements](#requirements)
   - [Getting Started](#getting-started)
   - [Usage](#usage)
@@ -17,6 +18,8 @@
 <!--  end tables of content  -->
 
 This project is a Laravel-based attendance system designed for general use. It features face recognition, geolocation, and flexible shift management. The system is ideal for organizations needing an efficient way to track attendance, manage schedules, and handle absences.
+
+<!-- mobile apps demo :  -->
 
 ## Features
 
@@ -31,6 +34,10 @@ This project is a Laravel-based attendance system designed for general use. It f
 - **Filament 3**: Used for the admin interface and resource management.
 - **MySQL 8.0**: The database system used to store all records.
 - **Sanctum**: For API authentication.
+
+## Screenshot
+
+Screenshot of the Laravel Attendance Lab application:
 
 ## Requirements
 
