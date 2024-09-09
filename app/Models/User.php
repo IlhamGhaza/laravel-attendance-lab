@@ -3,14 +3,25 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
+use Filament\Panel;
 
-class User extends Authenticatable
+
+class User extends Authenticatable implements FilamentUser
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable,HasApiTokens,HasRoles,SoftDeletes;
 
+     public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->role == 'admin';
+    }
     /**
      * The attributes that are mass assignable.
      *
@@ -19,7 +30,19 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'role',
         'password',
+        'first_name',
+        'last_name',
+        'date_of_birth',
+        'gender',
+        'address',
+        'phone',
+        'department_id',
+        'lab_id',
+        'face_embedding',
+        'image',
+        'fcm_token',
     ];
 
     /**
@@ -44,4 +67,24 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function lab()
+    {
+        return $this->belongsTo(Lab::class);
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
+    }
+
+   //absence
+   public function absences()
+   {
+       return $this->hasMany(Absence::class);
+   }
 }
