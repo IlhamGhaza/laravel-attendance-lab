@@ -6,18 +6,23 @@ use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static ?int $navigationSort = 1;
+    protected static ?string $navigationGroup = 'Users Management';
 
     public static function form(Form $form): Form
     {
@@ -30,32 +35,64 @@ class UserResource extends Resource
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('role')
+                Select::make('role')
+                    ->options([
+                        'admin' => 'Admin',
+                        'staff' => 'Staff',
+                        'user' => 'User',
+                    ])
                     ->required(),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
+                // Forms\Components\DateTimePicker::make('email_verified_at'),
                 Forms\Components\TextInput::make('password')
                     ->password()
-                    ->required()
+                    ->revealable()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('first_name')
+                    ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('last_name')
+                    ->required()
                     ->maxLength(255),
-                Forms\Components\DatePicker::make('date_of_birth'),
-                Forms\Components\TextInput::make('gender'),
+                Forms\Components\DatePicker::make('date_of_birth')
+                    ->maxDate(now()->subYears(15))
+                    ->required(),
+                Select::make('gender')
+                    ->options([
+                        'male' => 'Male',
+                        'female' => 'Female',
+                    ])
+                    ->required(),
                 Forms\Components\TextInput::make('address')
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->required(),
                 Forms\Components\TextInput::make('phone')
                     ->tel()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('department_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('lab_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('position'),
-                Forms\Components\Textarea::make('face_embedding')
-                    ->columnSpanFull(),
+                    ->maxLength(255)
+                    ->required(),
+                Select::make('department_id')
+                    ->relationship('department', 'name')
+                    ->preload()
+                    ->native()
+                    // ->required()
+                    ->searchable(),
+                Select::make('lab_id')
+                    ->relationship('lab', 'name')
+                    ->preload()
+                    ->native()
+                    // ->required()
+                    ->searchable(),
+                Select::make('position')
+                    ->options([
+                        'assistant' => 'Assistant',
+                        'tutor' => 'Tutor',
+                        'ketua' => 'Ketua',
+                        'staff' => 'Staff',
+                    ])
+                    ->required(),
+                // Forms\Components\Textarea::make('face_embedding')
+                //     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('image')
+                    ->disk('user_images')
                     ->image(),
             ]);
     }
@@ -65,33 +102,63 @@ class UserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->label('Username')
+                    ->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('role'),
+                    ->searchable()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('role')
+                    ->badge()
+                    ->color(function (User $record) {
+                        return match ($record->role) {
+                            'admin' => 'danger',
+                            'staff' => 'warning',
+                            'user' => 'primary',
+                        };
+                    })
+                    ->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('first_name')
-                    ->searchable(),
+                    ->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('last_name')
-                    ->searchable(),
+                    ->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('date_of_birth')
                     ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('gender'),
+                    ->searchable()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('gender')
+                    ->badge()
+                    ->color(function (User $record) {
+                        return match ($record->gender) {
+                            'male' => 'success',
+                            'female' => 'danger',
+                        };
+                    })
+                    ->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('address')
-                    ->searchable(),
+                    ->searchable()->toggleable(),
                 Tables\Columns\TextColumn::make('phone')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('department_id')
+                    ->searchable()->toggleable(),
+                Tables\Columns\TextColumn::make('department.name')
                     ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('lab_id')
+                    ->searchable()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('lab.name')
                     ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('position'),
-                Tables\Columns\ImageColumn::make('image'),
+                    ->searchable()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('position')
+                    ->badge()
+                    ->color(function (User $record) {
+                        return match ($record->position) {
+                            'assistant' => 'info',
+                            'tutor' => 'primary',
+                            'ketua' => 'success',
+                            'staff' => 'warning',
+                        };
+                    })
+                    ->searchable()->sortable()->toggleable(),
+                Tables\Columns\ImageColumn::make('image')
+                    ->disk('user_images'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -111,12 +178,53 @@ class UserResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Success')
+                        ->success()
+                        ->body('User has been deleted!')
+                ),
+                Tables\Actions\RestoreAction::make('restore')
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Success')
+                        ->success()
+                        ->body('User has been restored!')
+                ),
+                Tables\Actions\ForceDeleteAction::make('forceDelete')
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Success')
+                        ->success()
+                        ->body('User has been force deleted!')
+                )
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->successNotification(
+                        fn () => Notification::make()
+                            ->title('Success')
+                            ->success()
+                            ->body('User has been deleted!')
+
+                    ),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ->successNotification(
+                        fn () => Notification::make()
+                            ->title('Success')
+                            ->success()
+                            ->body('User has been force deleted!')
+                    ),
+                    Tables\Actions\RestoreBulkAction::make()
+                    ->successNotification(
+                        fn () => Notification::make()
+                            ->title('Success')
+                            ->success()
+                            ->body('User has been restored!')
+
+                    ),
                 ]),
             ]);
     }

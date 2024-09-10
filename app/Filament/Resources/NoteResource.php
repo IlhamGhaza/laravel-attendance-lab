@@ -6,29 +6,36 @@ use App\Filament\Resources\NoteResource\Pages;
 use App\Filament\Resources\NoteResource\RelationManagers;
 use App\Models\Note;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Notifications\Notification;
+
 
 class NoteResource extends Resource
 {
     protected static ?string $model = Note::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationGroup = 'Attendance Management';
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('user_id')
+                Select::make('user_id')
                     ->required()
-                    ->numeric(),
+                    ->searchable()
+                    ->preload()
+                    ->relationship('user', 'name'),
                 Forms\Components\TextInput::make('title')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(100),
                 Forms\Components\Textarea::make('note')
                     ->required()
                     ->columnSpanFull(),
@@ -39,11 +46,12 @@ class NoteResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('user.name')
+                    ->toggleable()
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
-                    ->searchable(),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -63,12 +71,45 @@ class NoteResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\RestoreAction::make('restore')
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Note Restored')
+                        ->body('The note has been restored.')
+                        ->success()
+                ),
+                Tables\Actions\ForceDeleteAction::make('force delete')
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Note Deleted')
+                        ->body('The note has been deleted.')
+                        ->success()
+
+                ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->successNotification(
+                            fn () => Notification::make()
+                                ->title('Notes Deleted')
+                                ->body('The selected notes have been deleted.')
+                                ->success()
+                        ),
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->successNotification(
+                            fn () => Notification::make()
+                                ->title('Notes Restored')
+                                ->body('The selected notes have been restored.')
+                        ),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->successNotification(
+                            fn () => Notification::make()
+                                ->title('Notes Deleted')
+                                ->body('The selected notes have been deleted.')
+                                ->success()
+                        ),
                 ]),
             ]);
     }

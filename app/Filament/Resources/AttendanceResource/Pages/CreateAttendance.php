@@ -5,6 +5,8 @@ namespace App\Filament\Resources\AttendanceResource\Pages;
 use App\Filament\Resources\AttendanceResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Notifications\Notification;
+
 
 class CreateAttendance extends CreateRecord
 {
@@ -13,4 +15,5 @@ class CreateAttendance extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
+    
 }
