@@ -45,5 +45,13 @@ class DatabaseSeeder extends Seeder
             'role' => 'user',
             'password' => Hash::make('45678912'),
         ]);
+
+    //call all seeder
+
+   $this->call([
+            AttendaceSeeder::class,
+            AbsenceSeeder::class,
+        ]);
     }
+
 }

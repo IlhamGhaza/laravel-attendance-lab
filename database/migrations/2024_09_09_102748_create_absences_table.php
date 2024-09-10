@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('image')->nullable();
             // is_approved is a boolean column
             $table->boolean('is_approved')->default(false);
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

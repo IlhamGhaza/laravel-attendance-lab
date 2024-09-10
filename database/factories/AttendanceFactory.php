@@ -18,7 +18,7 @@ class AttendanceFactory extends Factory
     {
         return [
             //
-            'user_id' => 1,
+            'user_id' => 2,
             'date' => $this->faker->date(),
             'time_in' => $this->faker->time(),
             'time_out' => $this->faker->time(),
