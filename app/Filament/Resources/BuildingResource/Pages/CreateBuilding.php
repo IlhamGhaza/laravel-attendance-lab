@@ -5,6 +5,7 @@ namespace App\Filament\Resources\BuildingResource\Pages;
 use App\Filament\Resources\BuildingResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Notifications\Notification;
 
 class CreateBuilding extends CreateRecord
 {
@@ -12,5 +13,13 @@ class CreateBuilding extends CreateRecord
     public function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
+    }
+    //success notify
+    protected function getSavedNotification(): ?Notification
+    {
+        return Notification::make()
+            ->success()
+            ->title('Building Created')
+            ->body('The building has been created successfully.');
     }
 }

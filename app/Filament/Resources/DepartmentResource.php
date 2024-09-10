@@ -12,12 +12,16 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Notifications\Notification;
+
 
 class DepartmentResource extends Resource
 {
     protected static ?string $model = Department::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-building-library';
+    protected static ?string $navigationGroup = 'Departments Management';
+    protected static ?int $navigationSort = 7;
 
     public static function form(Form $form): Form
     {
@@ -58,12 +62,52 @@ class DepartmentResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Department Deleted')
+                        ->message('The department was deleted successfully')
+                        ->success()
+                ),
+                Tables\Actions\RestoreAction::make('restore')
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Department Restored')
+                        ->message('The department was restored successfully')
+                        ->success()
+                ),
+                Tables\Actions\ForceDeleteAction::make('forceDelete')
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Department Permanently Deleted')
+                        ->message('The department was permanently deleted')
+                        ->success()
+                ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Department Deleted')
+                        ->message('The department was deleted successfully')
+                        ->success()
+                    ),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ->color('success')
+                    ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Department Restored')
+                        ->message('The department was restored successfully')
+                        ->success()
+                    ),
+                    Tables\Actions\RestoreBulkAction::make()
+                    ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Department Permanently Deleted')
+                        ->message('The department was permanently deleted')
+                        ->success()
+                    ),
                 ]),
             ]);
     }

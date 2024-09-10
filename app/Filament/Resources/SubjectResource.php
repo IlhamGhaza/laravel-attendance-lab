@@ -12,12 +12,16 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Notifications\Notification;
+
 
 class SubjectResource extends Resource
 {
     protected static ?string $model = Subject::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-book-open';
+    protected static ?string $navigationGroup = 'Departments Management';
+    protected static ?int $navigationSort = 8;
 
     public static function form(Form $form): Form
     {
@@ -26,9 +30,11 @@ class SubjectResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('department_id')
+                Forms\Components\Select::make('department_id')
                     ->required()
-                    ->numeric(),
+                    ->relationship('department', 'name')
+                    ->preload()
+                    ->searchable(),
             ]);
     }
 
@@ -37,9 +43,12 @@ class SubjectResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('department_id')
-                    ->numeric()
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('department.name')
+                    ->searchable()
+                    ->toggleable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -56,12 +65,52 @@ class SubjectResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->success()
+                        ->title('Subject has been deleted!')
+                        ->body('Subject has been deleted successfully!'),
+                ),
+                Tables\Actions\RestoreAction::make('Restore')
+                ->color('success')
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->success()
+                        ->title('Subject has been restored!')
+                        ->body('Subject has been restored successfully!'),
+                ),
+                Tables\Actions\ForceDeleteAction::make('Force Delete')
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->success()
+                        ->title('Subject has been permanently deleted!')
+                        ->body('Subject has been permanently deleted successfully!'),
+                ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->successNotification(
+                    fn () => Notification::make()
+                        ->success()
+                        ->title('Subject has been deleted!')
+                        ->body('Subject has been deleted successfully!'),
+                    ),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                     ->successNotification(
+                    fn () => Notification::make()
+                        ->success()
+                        ->title('Subject has been restored!')
+                        ->body('Subject has been restored successfully!'),
+                    ),
+                    Tables\Actions\RestoreBulkAction::make()
+                    ->successNotification(
+                    fn () => Notification::make()
+                        ->success()
+                        ->title('Subject has been permanently deleted!')
+                        ->body('Subject has been permanently deleted successfully!'),
+                     ),
                 ]),
             ]);
     }

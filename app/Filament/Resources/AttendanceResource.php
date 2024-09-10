@@ -8,6 +8,7 @@ use App\Models\Attendance;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -88,6 +89,22 @@ class AttendanceResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                // Tables\Actions\DeleteAction::make(),
+                Tables\Actions\RestoreAction::make()
+                ->color('success')
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->success()
+                        ->title('Attendance has been restored!')
+                        ->body('Attendance has been restored successfully!'),
+                ),
+                Tables\Actions\ForceDeleteAction::make()
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->success()
+                        ->title('Attendance has been permanently deleted!')
+                        ->body('Attendance has been permanently deleted successfully!'),
+                ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -98,6 +98,7 @@ class NoteResource extends Resource
                                 ->success()
                         ),
                     Tables\Actions\RestoreBulkAction::make()
+                    ->color('success')
                         ->successNotification(
                             fn () => Notification::make()
                                 ->title('Notes Restored')

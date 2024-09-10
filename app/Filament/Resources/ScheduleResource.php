@@ -12,35 +12,55 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Notifications\Notification;
 
 class ScheduleResource extends Resource
 {
     protected static ?string $model = Schedule::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-calendar';
+    protected static? string $navigationGroup = 'Scheduling';
+    protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('user_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('room_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('subject_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('department_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('day_of_week')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('shift_id')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Select::make('user_id')
+                    ->relationship('user', 'name')
+                    ->preload()
+                    ->searchable()
+                    ->required(),
+                Forms\Components\Select::make('room_id')
+                    ->relationship('room', 'name')
+                    ->preload()
+                    ->searchable()
+                    ->required(),
+                Forms\Components\Select::make('subject_id')
+                    ->relationship('subject', 'name')
+                    ->preload()
+                    ->searchable()
+                    ->required(),
+                Forms\Components\Select::make('department_id')
+                    ->relationship('department', 'name')
+                    ->preload()
+                    ->searchable()
+                    ->required(),
+                Forms\Components\Select::make('day_of_week')
+                    ->options([
+                        'Monday' => 'Monday',
+                        'Tuesday' => 'Tuesday',
+                        'Wednesday' => 'Wednesday',
+                        'Thursday' => 'Thursday',
+                        'Friday' => 'Friday',
+                        'Saturday' => 'Saturday',
+                    ])
+                    ->required(),
+                Forms\Components\Select::make('shift_id')
+                    ->relationship('shift', 'name')
+                    ->preload()
+                    ->searchable()
+                    ->required(),
             ]);
     }
 
@@ -48,22 +68,27 @@ class ScheduleResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('user.name')
+                    ->searchable()
+                    ->toggleable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('room_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('room.name')
+                    ->searchable()
+                    ->toggleable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('subject_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('subject.name')
+                    ->searchable()
+                    ->toggleable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('department_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('department.name')
+                    ->searchable()
+                    ->toggleable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('day_of_week')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('shift_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('shift.name')
+                    ->searchable()
+                    ->toggleable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -84,12 +109,53 @@ class ScheduleResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Schedule Deleted')
+                        ->body('Schedule has been deleted successfully')
+                        ->success()
+                ),
+                Tables\Actions\RestoreAction::make()
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Schedule Restored')
+                        ->body('Schedule has been restored successfully')
+                        ->success()
+
+                ),
+                Tables\Actions\ForceDeleteAction::make()
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Schedule Deleted')
+                        ->body('Schedule has been deleted successfully')
+                        ->success()
+                ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->successNotification(
+                        fn () => Notification::make()
+                            ->title('Schedule Deleted')
+                            ->body('Schedule has been deleted successfully')
+                            ->success()
+                        ),
+                        Tables\Actions\RestoreBulkAction::make()
+                        ->color('success')
+                        ->successNotification(
+                            fn () => Notification::make()
+                                ->title('Schedule Restored')
+                                ->body('Schedule has been restored successfully')
+                                ->success()
+                        ),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ->successNotification(
+                        fn () => Notification::make()
+                            ->title('Schedule Deleted')
+                            ->body('Schedule has been deleted successfully')
+                            ->success()
+                    ),
                 ]),
             ]);
     }

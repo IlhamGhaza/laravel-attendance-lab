@@ -186,6 +186,7 @@ class UserResource extends Resource
                         ->body('User has been deleted!')
                 ),
                 Tables\Actions\RestoreAction::make('restore')
+                ->color('success')
                 ->successNotification(
                     fn () => Notification::make()
                         ->title('Success')

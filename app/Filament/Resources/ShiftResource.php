@@ -12,12 +12,15 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Notifications\Notification;
 
 class ShiftResource extends Resource
 {
     protected static ?string $model = Shift::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-clock';
+    protected static ?string $navigationGroup = 'Scheduling';
+    protected static ?int $navigationSort = 6;
 
     public static function form(Form $form): Form
     {
@@ -26,9 +29,9 @@ class ShiftResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('start_time')
+                Forms\Components\TimePicker::make('start_time')
                     ->required(),
-                Forms\Components\TextInput::make('end_time')
+                Forms\Components\TimePicker::make('end_time')
                     ->required(),
             ]);
     }
@@ -38,7 +41,8 @@ class ShiftResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('start_time'),
                 Tables\Columns\TextColumn::make('end_time'),
                 Tables\Columns\TextColumn::make('created_at')
@@ -60,12 +64,54 @@ class ShiftResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Shift Deleted')
+                        ->body('Shift has been deleted successfully')
+                        ->success()
+                ),
+                Tables\Actions\RestoreAction::make('restore')
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Shift Restored')
+                        ->body('Shift has been restored successfully')
+                        ->success()
+                ),
+                Tables\Actions\ForceDeleteAction::make('Force Delete')
+                ->successNotification(
+                    fn () => Notification::make()
+                        ->title('Shift Deleted')
+                        ->body('Shift has been deleted successfully')
+                        ->success()
+
+                ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->successNotification(
+                        fn () => Notification::make()
+                            ->title('Shifts Deleted')
+                            ->body('Shifts have been deleted successfully')
+                            ->success()
+
+                    ),
+                    Tables\Actions\RestoreBulkAction::make()
+                    ->color('success')
+                    ->successNotification(
+                        fn () => Notification::make()
+                            ->title('Shifts Restored')
+                            ->body('Shifts have been restored successfully')
+                            ->success()
+                    ),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ->successNotification(
+                        fn () => Notification::make()
+                            ->title('Shifts Deleted')
+                            ->body('Shifts have been deleted successfully')
+                            ->success()
+                    ),
                 ]),
             ]);
     }

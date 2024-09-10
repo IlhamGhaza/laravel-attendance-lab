@@ -12,12 +12,16 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Notifications\Notification;
+
 
 class BuildingResource extends Resource
 {
     protected static ?string $model = Building::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+    protected static ?string $navigationGroup = 'Facility Management';
+    protected static ?int $navigationSort = 10;
 
     public static function form(Form $form): Form
     {
@@ -84,6 +88,22 @@ class BuildingResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\RestoreAction::make('Restore')
+                    ->color('success')
+                    ->successNotification(
+                        fn () => Notification::make()
+                            ->success()
+                            ->title('Building has been restored!')
+                            ->body('Building has been restored successfully.')
+                    ),
+                Tables\Actions\ForceDeleteAction::make('Force Delete')
+                    ->successNotification(
+                        fn () => Notification::make()
+                            ->success()
+                            ->title('Building has been force deleted!')
+                            ->body('Building has been force deleted successfully.')
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

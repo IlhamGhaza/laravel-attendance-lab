@@ -120,7 +120,8 @@ class AbsenceResource extends Resource
                    //if succes create notification success change
                     ->successNotificationTitle('Permission approved successfully'),
                 Tables\Actions\DeleteAction::make(),
-                Tables\Actions\RestoreAction::make('restore'),
+                Tables\Actions\RestoreAction::make('restore')
+                ->color('success'),
                 Tables\Actions\ForceDeleteAction::make('forceDelete'),
             ])
             ->bulkActions([

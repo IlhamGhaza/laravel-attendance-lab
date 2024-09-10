@@ -12,12 +12,16 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Notifications\Notification;
+
 
 class LabResource extends Resource
 {
     protected static ?string $model = Lab::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-beaker';
+    protected static ?string $navigationGroup = 'Departments Management';
+    protected static ?int $navigationSort = 9;
 
     public static function form(Form $form): Form
     {
@@ -59,6 +63,28 @@ class LabResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                ->successNotification(
+                    fn () => Notification::make()
+                    ->success()
+                    ->title('Lab has been deleted!')
+                    ->body('Lab has been deleted successfully.')
+                ),
+                Tables\Actions\RestoreAction::make('Restore')
+                ->color('success')
+                ->successNotification(
+                    fn () => Notification::make()
+                    ->success()
+                    ->title('Lab has been restored!')
+                    ->body('Lab has been restored successfully.')
+                ),
+                Tables\Actions\ForceDeleteAction::make('Force Delete')
+                ->successNotification(
+                    fn () => Notification::make()
+                    ->success()
+                    ->title('Lab has been force deleted!')
+                    ->body('Lab has been force deleted successfully.')
+                ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
