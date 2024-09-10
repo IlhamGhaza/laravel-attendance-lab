@@ -44,6 +44,21 @@ return [
             'throw' => false,
         ],
 
+        //define folder for public root
+        'permissions' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/permissions'),
+            'url' => env('APP_URL') . '/storage/permissions',
+            'visibility' => 'public',
+        ],
+        'user_images' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/user_images'),
+            'url' => env('APP_URL') . '/storage/user_images',
+            'visibility' => 'public',
+        ],
+        //
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
