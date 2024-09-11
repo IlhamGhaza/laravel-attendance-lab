@@ -3,25 +3,26 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
+
     protected static ?int $navigationSort = 1;
+
     protected static ?string $navigationGroup = 'Users Management';
 
     public static function form(Form $form): Form
@@ -33,15 +34,14 @@ class UserResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('email')
                     ->email()
+                    ->unique(ignoreRecord: true)
                     ->required()
                     ->maxLength(255),
-                Select::make('role')
-                    ->options([
-                        'admin' => 'Admin',
-                        'staff' => 'Staff',
-                        'user' => 'User',
-                    ])
-                    ->required(),
+                Forms\Components\Select::make('roles')
+                    ->relationship('roles', 'name')
+                    // ->multiple()
+                    ->preload()
+                    ->searchable(),
                 // Forms\Components\DateTimePicker::make('email_verified_at'),
                 Forms\Components\TextInput::make('password')
                     ->password()
@@ -106,16 +106,28 @@ class UserResource extends Resource
                     ->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()->sortable()->toggleable(),
-                Tables\Columns\TextColumn::make('role')
+                TextColumn::make('roles.name')
+                    ->label('Role')
                     ->badge()
                     ->color(function (User $record) {
                         return match ($record->role) {
+                            'super_admin' => 'danger',
                             'admin' => 'danger',
                             'staff' => 'warning',
                             'user' => 'primary',
                         };
                     })
                     ->searchable()->sortable()->toggleable(),
+                // Tables\Columns\TextColumn::make('role')
+                //     ->badge()
+                //     ->color(function (User $record) {
+                //         return match ($record->role) {
+                //             'admin' => 'danger',
+                //             'staff' => 'warning',
+                //             'user' => 'primary',
+                //         };
+                //     })
+                //     ->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->dateTime()
                     ->toggleable(isToggledHiddenByDefault: true)
@@ -179,53 +191,53 @@ class UserResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
-                ->successNotification(
-                    fn () => Notification::make()
-                        ->title('Success')
-                        ->success()
-                        ->body('User has been deleted!')
-                ),
-                Tables\Actions\RestoreAction::make('restore')
-                ->color('success')
-                ->successNotification(
-                    fn () => Notification::make()
-                        ->title('Success')
-                        ->success()
-                        ->body('User has been restored!')
-                ),
-                Tables\Actions\ForceDeleteAction::make('forceDelete')
-                ->successNotification(
-                    fn () => Notification::make()
-                        ->title('Success')
-                        ->success()
-                        ->body('User has been force deleted!')
-                )
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
                     ->successNotification(
                         fn () => Notification::make()
                             ->title('Success')
                             ->success()
                             ->body('User has been deleted!')
-
                     ),
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                Tables\Actions\RestoreAction::make('restore')
+                    ->color('success')
+                    ->successNotification(
+                        fn () => Notification::make()
+                            ->title('Success')
+                            ->success()
+                            ->body('User has been restored!')
+                    ),
+                Tables\Actions\ForceDeleteAction::make('forceDelete')
                     ->successNotification(
                         fn () => Notification::make()
                             ->title('Success')
                             ->success()
                             ->body('User has been force deleted!')
                     ),
-                    Tables\Actions\RestoreBulkAction::make()
-                    ->successNotification(
-                        fn () => Notification::make()
-                            ->title('Success')
-                            ->success()
-                            ->body('User has been restored!')
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->successNotification(
+                            fn () => Notification::make()
+                                ->title('Success')
+                                ->success()
+                                ->body('User has been deleted!')
 
-                    ),
+                        ),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->successNotification(
+                            fn () => Notification::make()
+                                ->title('Success')
+                                ->success()
+                                ->body('User has been force deleted!')
+                        ),
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->successNotification(
+                            fn () => Notification::make()
+                                ->title('Success')
+                                ->success()
+                                ->body('User has been restored!')
+
+                        ),
                 ]),
             ]);
     }

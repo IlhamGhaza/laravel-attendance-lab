@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -16,7 +17,7 @@ use Filament\Panel;
 
 class User extends Authenticatable implements FilamentUser
 {
-    use HasFactory, Notifiable,HasApiTokens,HasRoles,SoftDeletes;
+    use HasFactory, Notifiable,SoftDeletes,HasApiTokens,HasRoles,HasPanelShield;
 
      public function canAccessPanel(Panel $panel): bool
     {
