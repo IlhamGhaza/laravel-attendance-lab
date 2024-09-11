@@ -75,16 +75,33 @@ To get started with the Laravel Attendance Lab project, follow the steps below:
       php artisan migrate --seed
       ```
 
-6. **Serve the application**:
+6. **Install Laravel Shield for User Permissions**:
+    you can use this command to install Laravel Shield for user permissions
+
+    ```bash
+    php artisan shield:install
+    ```
+
+   to generate all permissions
+
+    ```bash
+    php artisan shield:generate --all
+    ```
+
+    you can read the documentation [here](https://filamentphp.com/plugins/bezhansalleh-shield)
+
+7. **Serve the application**:
 
     ```bash
     php artisan serve
     ```
 
-7. **Access the application**:
+8. **Access the application**:
 
     Open your web browser and visit `http://localhost:8000/admin` to access the Laravel Attendance Lab application.
-8. **Admin Panel**: Log in with the admin credentials provided during the seed process.
+9.  **Admin Panel**:
+
+    Log in with the admin credentials provided during the seed process.
 
 ## Usage
 
