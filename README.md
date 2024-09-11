@@ -99,7 +99,8 @@ To get started with the Laravel Attendance Lab project, follow the steps below:
 8. **Access the application**:
 
     Open your web browser and visit `http://localhost:8000/admin` to access the Laravel Attendance Lab application.
-9.  **Admin Panel**:
+
+9. **Admin Panel**:
 
     Log in with the admin credentials provided during the seed process.
 
